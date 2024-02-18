@@ -20,7 +20,7 @@ namespace PackageAnalyzerDesktop
             InitializeComponent();
         }
 
-        private void FileListBox_Drop(object sender, DragEventArgs e)
+        private void FileOrFolder_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
             {
@@ -41,12 +41,12 @@ namespace PackageAnalyzerDesktop
                             fileNames.Add(Path.GetFileName(file) + " (Folder)");
                         }
                     }
-                    AddFilesToListBox(fileNames);
+                    //AddFilesToListBox(fileNames);
                 }
             }
         }
 
-        private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        private void UploadFileOrFolder_Click(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
@@ -63,7 +63,7 @@ namespace PackageAnalyzerDesktop
 
                     if (openFileDialog.ShowDialog() == true)
                     {
-                        AddFilesToListBox(openFileDialog.FileNames);
+                        //AddFilesToListBox(openFileDialog.FileNames);
                     }
                 }
                 else if (result == Gat.Controls.MessageBoxResult.No) // Select Folder
@@ -76,27 +76,27 @@ namespace PackageAnalyzerDesktop
                     if (folderBrowserDialog.ShowDialog() == true)
                     {
                         string selectedFolder = folderBrowserDialog.SelectedPath;
-                        AddFilesToListBox(Directory.GetFiles(selectedFolder));
+                        //AddFilesToListBox(Directory.GetFiles(selectedFolder));
                     }
                 }     
             }
         }
 
-        private void AddFilesToListBox(IEnumerable<string> files)
-        {
-            List<string> currentFileNames = fileListBox.Items.Cast<string>().ToList();
+        //private void AddFilesToListBox(IEnumerable<string> files)
+        //{
+        //    List<string> currentFileNames = fileListBox.Items.Cast<string>().ToList();
 
-            // Extract new file names from the provided files
-            List<string> newFileNames = files.Select(file => Path.GetFileName(file)).ToList();
+        //    // Extract new file names from the provided files
+        //    List<string> newFileNames = files.Select(file => Path.GetFileName(file)).ToList();
 
-            // Merge existing and new file names
-            List<string> mergedFileNames = currentFileNames.Union(newFileNames).ToList();
+        //    // Merge existing and new file names
+        //    List<string> mergedFileNames = currentFileNames.Union(newFileNames).ToList();
 
-            // Bind the merged file names to the ListBox
-            Binding binding = new Binding();
-            binding.Source = mergedFileNames;
-            fileListBox.SetBinding(ItemsControl.ItemsSourceProperty, binding);
-        }
+        //    // Bind the merged file names to the ListBox
+        //    Binding binding = new Binding();
+        //    binding.Source = mergedFileNames;
+        //    fileListBox.SetBinding(ItemsControl.ItemsSourceProperty, binding);
+        //}
 
 
 

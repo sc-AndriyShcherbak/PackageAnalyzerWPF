@@ -1,6 +1,7 @@
-﻿<Window x:Class="PackageAnalyzerDesktop.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="PackageAnalyzerDesktop.MainWindow"
         Title="Package Analyzer" Height="500" Width="800"
         WindowStartupLocation="CenterScreen">
     <Grid>
@@ -14,16 +15,16 @@
                 AllowDrop="True" Drop="FileOrFolder_Drop" Margin="10">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Drag and Drop Files or Folders" />
-                <Button Content="Upload File" MouseDown="UploadFileOrFolder_Click" Margin="0,5,0,5"/>
-                <Button Content="Upload Folder" MouseDown="UploadFileOrFolder_Click" />
+                <Button Content="Upload File" Margin="0,5,0,5"/>
+                <Button Content="Upload Folder" />
             </StackPanel>
         </Border>
 
         <!-- Checkbox stack panel -->
-        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="40,20,0,0" Grid.Row="1" >
+        <StackPanel x:Name="CheckBoxPanel" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="40,20,0,0" Grid.Row="1" >
             <CheckBox Content="Sitecore (pre-release) version" IsChecked="True"/>
             <CheckBox Content="Sitecore roles from web.config" IsChecked="True" />
-            <CheckBox Content="Installed modules" IsChecked="True" />
+            <CheckBox Content="Installed modules" IsChecked="True"/>
             <CheckBox Content="Hotfixes installed" IsChecked="True"/>
             <CheckBox Content="Assembly versions" IsChecked="True"/>
             <CheckBox Content="Key settings values" IsChecked="True"/>
@@ -31,6 +32,10 @@
         </StackPanel>
 
         <!-- Data report table -->
-        <DataGrid Name="dataGrid" Grid.Row="1" AutoGenerateColumns="True" Margin="20,141,20,20"/>
+        <DataGrid x:Name="SitecoreDataGrid" Grid.Row="1" Margin="20,141,20,20" />
+        <ListBox x:Name="fileListBox" Grid.Row="1" Margin="286,37,106,0" MouseDoubleClick="FileListBox_MouseDoubleClick" VerticalAlignment="Top" Height="89" />
+
+        <Label Content="Uploaded Files or Folders" HorizontalAlignment="Left" Margin="286,11,0,0" Grid.Row="1" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
+
     </Grid>
 </Window>

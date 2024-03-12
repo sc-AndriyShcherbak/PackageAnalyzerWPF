@@ -12,19 +12,26 @@ namespace PackageAnalyzerDesktop.Core
     {
         public static string GetSitecoreRoles(string filePath)
         {
-            WebConfigInfoReader webConfigInfoReader = new WebConfigInfoReader();
-
             string result = string.Empty;
-            string pattern = @"[\/\\[\]]";
-
-            foreach (var item in webConfigInfoReader.ReadRole(filePath))
+            try
             {
-                string key = Regex.Replace(item.Key, pattern, "").Replace("configs", "", StringComparison.OrdinalIgnoreCase)
-                    .Replace("web.config", "", StringComparison.OrdinalIgnoreCase);
-                key = ExtractLastWord(key);
-                result += key + " = " + item.Value + Environment.NewLine;
-            }
+                WebConfigInfoReader webConfigInfoReader = new WebConfigInfoReader();   
+                string pattern = @"[\/\\[\]]";
 
+                foreach (var item in webConfigInfoReader.ReadRole(filePath))
+                {
+                    string key = Regex.Replace(item.Key, pattern, "").Replace("configs", "", StringComparison.OrdinalIgnoreCase)
+                        .Replace("web.config", "", StringComparison.OrdinalIgnoreCase);
+                    key = ExtractLastWord(key);
+                    //result += key + " = " + item.Value + Environment.NewLine;
+                    result += item.Value + Environment.NewLine;
+                }
+            }
+            catch (Exception)
+            {
+                // Write the error to logs
+                result = "No roles found";
+            }
             return result;
         }
 
@@ -36,31 +43,37 @@ namespace PackageAnalyzerDesktop.Core
 
         public static string GetSitecoreVersions(string filePath)
         {
-            SitecoreVersionReader sitecoreVersionReader = new SitecoreVersionReader();
-
             string result = string.Empty;
-            string pattern = @"[\/\\[\]]";
-
-            var versions = sitecoreVersionReader.Read(filePath);
-
-            if (versions == null || versions.Count() == 0)
+            try
             {
-                return result;
-            }
+                SitecoreVersionReader sitecoreVersionReader = new SitecoreVersionReader();
 
-            if (versions.Values.Distinct().Count() == 1)
-            {
-                return versions.Values.FirstOrDefault();
-            }
-            else
-            {
-                foreach (var item in sitecoreVersionReader.Read(filePath))
+                var versions = sitecoreVersionReader.Read(filePath);
+
+                if (versions == null || versions.Count() == 0)
                 {
-                    //string key = Regex.Replace(item.Key, pattern, "").Replace("configs", "", StringComparison.OrdinalIgnoreCase)
-                    //    .Replace("web.config", "", StringComparison.OrdinalIgnoreCase);
-                    result += item.Key + " = " + item.Value + Environment.NewLine;
+                    result = "No version information found";
+                    return result;
+                }
+
+                if (versions.Values.Distinct().Count() == 1)
+                {
+                    return versions.Values.FirstOrDefault();
+                }
+                else
+                {
+                    foreach (var item in sitecoreVersionReader.Read(filePath))
+                    {
+                        result += item.Key + " = " + item.Value + Environment.NewLine;
+                    }
                 }
             }
+            catch (Exception)
+            {
+                // Write the error to logs
+                result = "No version information found";
+            }
+            
             return result;
         }
 

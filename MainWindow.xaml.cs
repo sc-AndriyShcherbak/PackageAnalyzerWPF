@@ -22,10 +22,37 @@ namespace PackageAnalyzerDesktop
     public partial class MainWindow : Window
     {
         ObservableCollection<SitecoreData> dataToShow;
+        string tempFolder = string.Empty;
         public MainWindow()
         {
             dataToShow = new ObservableCollection<SitecoreData>();
             InitializeComponent();
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Clean up and remove the temporary folder
+            CleanUpTemporaryFolder();
+        }
+
+        private void CleanUpTemporaryFolder()
+        {
+            string tempFolderPath = tempFolder;
+
+            // Check if the temporary folder exists before attempting to delete it
+            if (Directory.Exists(tempFolderPath))
+            {
+                try
+                {
+                    // Delete the temporary folder and its contents
+                    Directory.Delete(tempFolderPath, true);
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions that may occur during the cleanup process
+                    MessageBox.Show($"Error cleaning up temporary folder: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void FileOrFolder_Drop(object sender, DragEventArgs e)
@@ -60,6 +87,12 @@ namespace PackageAnalyzerDesktop
 
         private void ProcessCheckboxes(string filePath)
         {
+            string fileOrFolderPath = ArchiveHandler.Unarchive(filePath);
+            if (fileOrFolderPath != filePath)
+            {
+                tempFolder = fileOrFolderPath;
+            }
+            tempFolder = fileOrFolderPath;
             foreach (var child in CheckBoxPanel.Children)
             {
                 if (child is CheckBox checkbox)
@@ -72,7 +105,7 @@ namespace PackageAnalyzerDesktop
                             {
                                 SitecoreData versions = new SitecoreData();
                                 versions.Identifier = checkbox.Content.ToString();
-                                versions.Value = PackageAnalyzerAdapter.GetSitecoreVersions(filePath);
+                                versions.Value = PackageAnalyzerAdapter.GetSitecoreVersions(fileOrFolderPath);
                                 dataToShow.Add(versions);
                             }
                             break;
@@ -83,7 +116,7 @@ namespace PackageAnalyzerDesktop
                             {
                                 SitecoreData roles = new SitecoreData();
                                 roles.Identifier = checkbox.Content.ToString();
-                                roles.Value = PackageAnalyzerAdapter.GetSitecoreRoles(filePath);
+                                roles.Value = PackageAnalyzerAdapter.GetSitecoreRoles(fileOrFolderPath);
                                 dataToShow.Add(roles);
                             }
                             break;

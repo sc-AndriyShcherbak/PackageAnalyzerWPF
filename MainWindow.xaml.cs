@@ -84,100 +84,93 @@ namespace PackageAnalyzerDesktop
             }
         }
 
-
+        #region ProcessCheckboxes
         private void ProcessCheckboxes(string filePath)
         {
             string fileOrFolderPath = ArchiveHandler.Unarchive(filePath);
+
             if (fileOrFolderPath != filePath)
             {
                 tempFolder = fileOrFolderPath;
             }
-            tempFolder = fileOrFolderPath;
-            foreach (var child in CheckBoxPanel.Children)
+
+            foreach (var child in CheckBoxPanel.Children.OfType<CheckBox>().Where(c => c.IsChecked == true))
             {
-                if (child is CheckBox checkbox)
+                switch (child.Content.ToString())
                 {
-                    switch (checkbox.Content.ToString())
-                    {
-                        case "Sitecore (pre-release) version":
-                            // Process logic for "Sitecore (pre-release) version" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                SitecoreData versions = new SitecoreData();
-                                versions.Identifier = checkbox.Content.ToString();
-                                versions.Value = PackageAnalyzerAdapter.GetSitecoreVersions(fileOrFolderPath);
-                                dataToShow.Add(versions);
-                            }
-                            break;
+                    case "Sitecore (pre-release) version":
+                        ProcessCheckbox("Sitecore (pre-release) version", fileOrFolderPath, PackageAnalyzerAdapter.GetSitecoreVersions);
+                        break;
 
-                        case "Sitecore roles from web.config":
-                            // Process logic for "Sitecore roles from web.config" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                SitecoreData roles = new SitecoreData();
-                                roles.Identifier = checkbox.Content.ToString();
-                                roles.Value = PackageAnalyzerAdapter.GetSitecoreRoles(fileOrFolderPath);
-                                dataToShow.Add(roles);
-                            }
-                            break;
+                    case "Sitecore roles from web.config":
+                        ProcessCheckbox("Sitecore roles from web.config", fileOrFolderPath, PackageAnalyzerAdapter.GetSitecoreRoles);
+                        break;
 
-                        case "Installed modules":
-                            // Process logic for "Installed modules" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                // Checkbox is checked, perform corresponding action
-                                // Add your logic here
-                            }
-                            break;
+                    case "Installed modules":
+                        // Process logic for "Installed modules" checkbox
+                        // Add your logic here
+                        break;
 
-                        case "Hotfixes installed":
-                            // Process logic for "Hotfixes installed" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                // Checkbox is checked, perform corresponding action
-                                // Add your logic here
-                            }
-                            break;
+                    case "Hotfixes installed":
+                        // Process logic for "Hotfixes installed" checkbox
+                        // Add your logic here
+                        break;
 
-                        case "Assembly versions":
-                            // Process logic for "Assembly versions" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                // Checkbox is checked, perform corresponding action
-                                // Add your logic here
-                            }
-                            break;
+                    case "Assembly versions":
+                        // Process logic for "Assembly versions" checkbox
+                        // Add your logic here
+                        break;
 
-                        case "Key settings values":
-                            // Process logic for "Key settings values" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                // Checkbox is checked, perform corresponding action
-                                // Add your logic here
-                            }
-                            break;
+                    case "Key settings values":
+                        // Process logic for "Key settings values" checkbox
+                        // Add your logic here
+                        break;
 
-                        case "Topology (XM/XP)":
-                            // Process logic for "Topology (XM/XP)" checkbox
-                            if (checkbox.IsChecked == true)
-                            {
-                                // Checkbox is checked, perform corresponding action
-                                // Add your logic here
-                            }
-                            break;
+                    case "Topology (XM/XP)":
+                        ProcessCheckboxWithExceptionHandling("Topology (XM/XP)", fileOrFolderPath, CheckTopology);
+                        break;
 
-                        // Add more cases for additional checkboxes if needed
+                    // Add more cases for additional checkboxes if needed
 
-                        default:
-                            // Handle any other checkboxes not covered in cases
-                            break;
-                    }
+                    default:
+                        // Handle any other checkboxes not covered in cases
+                        break;
                 }
             }
             //return dataToShow;
         }
 
+        private void ProcessCheckbox(string identifier, string filePath, Func<string, string> valueProvider)
+        {
+            SitecoreData data = new SitecoreData
+            {
+                Identifier = identifier,
+                Value = valueProvider(filePath)
+            };
+            dataToShow.Add(data);
+        }
 
+        private void ProcessCheckboxWithExceptionHandling(string identifier, string filePath, Func<string, string> valueProvider)
+        {
+            try
+            {
+                ProcessCheckbox(identifier, filePath, valueProvider);
+            }
+            catch (Exception ex)
+            {
+                // Handle exception appropriately (log, display message, etc.)
+                // You can customize this part based on your requirements
+                throw;
+            }
+        }
+
+        private string CheckTopology(string filePath)
+        {
+            TopologyChecker topologyChecker = new TopologyChecker();
+            return topologyChecker.CheckTopology(filePath);
+        }
+
+        #endregion
 
         private void AddRowToDataGrid()
         {
